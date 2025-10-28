@@ -1,0 +1,40 @@
+{
+  "schema_version": "v1",
+  "name": "Company Employee Viewer",
+  "description": "Secure, minimal ChatGPT App that displays and updates employee records using an MCP server.",
+  "version": "1.2.0",
+  "author": "Your Company",
+  "contact_email": "you@example.com",
+  "icon_url": "https://example.com/icon.png",
+  "privacy_policy_url": "https://example.com/privacy",
+  "terms_of_service_url": "https://example.com/terms",
+  "categories": [
+    "productivity",
+    "developer-tools"
+  ],
+  "mcp": {
+    "servers": [
+      {
+        "name": "companydb-mcp",
+        "url": "https://YOUR_DOMAIN/.well-known/mcp.json",
+        "auth": {
+          "type": "api_key",
+          "header_name": "Authorization",
+          "token_format": "Bearer <API_KEY>"
+        }
+      }
+    ]
+  },
+  "permissions": {
+    "tools": [
+      "get_employee",
+      "update_status"
+    ]
+  },
+  "ui": {
+    "entrypoint": {
+      "type": "html",
+      "content_url": "https://YOUR_DOMAIN/ui/index.html"
+    }
+  }
+}

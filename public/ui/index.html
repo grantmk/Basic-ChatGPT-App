@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Viewer</title>
+  <style>
+    :root { --pad: 16px; --radius: 12px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f6f7f9; margin: 0; padding: var(--pad); }
+    .container { max-width: 720px; margin: 0 auto; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: var(--radius); padding: var(--pad); box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .row { display: flex; gap: 8px; align-items: center; }
+    label { font-weight: 600; }
+    input, select, button { padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; }
+    button.primary { background: #2563eb; color: white; border: none; }
+    .status { font-weight: 700; }
+    .muted { color: #6b7280; }
+    .spacer { height: 8px; }
+    pre { background: #f3f4f6; padding: 8px; border-radius: 8px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Company Employee Viewer</h1>
+    <div class="card" id="controls">
+      <div class="row">
+        <label for="empId">Employee ID</label>
+        <input id="empId" value="1234" />
+        <button class="primary" id="btnLoad">Load</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="row">
+        <label for="newStatus">Set status</label>
+        <select id="newStatus">
+          <option value="active">active</option>
+          <option value="on leave">on leave</option>
+          <option value="inactive">inactive</option>
+        </select>
+        <button id="btnUpdate">Update</button>
+      </div>
+      <p class="muted">In ChatGPT, tool calls are proxied via the MCP bridge. When running locally, provide your API key below.</p>
+      <div class="row">
+        <label for="apiKey">API key</label>
+        <input id="apiKey" placeholder="Bearer token" />
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="card" id="employee-card">
+      <p class="muted">No employee loaded yet.</p>
+    </div>
+
+    <div class="spacer"></div>
+
+    <details class="card">
+      <summary>Debug payload</summary>
+      <pre id="debug"></pre>
+    </details>
+  </div>
+
+  <script>
+    // Helper: render employee
+    function renderEmployee(emp) {
+      if (!emp) {
+        document.getElementById("employee-card").innerHTML = '<p class="muted">No employee loaded yet.</p>';
+        return;
+      }
+      document.getElementById("employee-card").innerHTML = `
+        <h2>${emp.name} <span class="muted">(ID ${emp.id})</span></h2>
+        <p><strong>Department:</strong> ${emp.department}</p>
+        <p><strong>Status:</strong> <span class="status">${emp.status}</span></p>
+        <p><strong>Email:</strong> <a href="mailto:${emp.email}">${emp.email}</a></p>
+      `;
+    }
+
+    // Bridge shims:
+    // 1) In ChatGPT, a bridge is available and the model will call tools for you.
+    //    Here we expose optional functions the environment could patch.
+    window.ChatGPTApp = window.ChatGPTApp || {};
+
+    // Local demo fallback: call the server directly (for development).
+    async function callToolLocally(path, args) {
+      const apiKey = document.getElementById("apiKey").value || "";
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": apiKey ? `Bearer ${apiKey}` : "" },
+        body: JSON.stringify(args || {})
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`HTTP ${res.status}: ${t}`);
+      }
+      return res.json();
+    }
+
+    async function getEmployee(id) {
+      if (window.ChatGPTApp.callTool) {
+        return await window.ChatGPTApp.callTool("get_employee", { id });
+      } else {
+        return await callToolLocally("/tools/get_employee", { id });
+      }
+    }
+
+    async function updateStatus(id, status) {
+      if (window.ChatGPTApp.callTool) {
+        return await window.ChatGPTApp.callTool("update_status", { id, status });
+      } else {
+        return await callToolLocally("/tools/update_status", { id, status });
+      }
+    }
+
+    // Wire UI
+    document.getElementById("btnLoad").addEventListener("click", async () => {
+      try {
+        const id = document.getElementById("empId").value.trim();
+        const result = await getEmployee(id);
+        renderEmployee(result.result);
+        document.getElementById("debug").textContent = JSON.stringify(result, null, 2);
+      } catch (e) {
+        document.getElementById("employee-card").innerHTML = `<p style="color:#b91c1c"><strong>Error:</strong> ${e.message}</p>`;
+      }
+    });
+
+    document.getElementById("btnUpdate").addEventListener("click", async () => {
+      try {
+        const id = document.getElementById("empId").value.trim();
+        const status = document.getElementById("newStatus").value;
+        const result = await updateStatus(id, status);
+        // reload
+        const after = await getEmployee(id);
+        renderEmployee(after.result);
+        document.getElementById("debug").textContent = JSON.stringify({ update: result, reload: after }, null, 2);
+      } catch (e) {
+        document.getElementById("employee-card").innerHTML = `<p style="color:#b91c1c"><strong>Error:</strong> ${e.message}</p>`;
+      }
+    });
+
+    // Optional: if the environment injects an initial payload, render it.
+    if (window.__CHATGPT_PAYLOAD__) {
+      renderEmployee(window.__CHATGPT_PAYLOAD__);
+      document.getElementById("debug").textContent = JSON.stringify(window.__CHATGPT_PAYLOAD__, null, 2);
+    }
+  </script>
+</body>
+</html>
