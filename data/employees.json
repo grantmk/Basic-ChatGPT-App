@@ -1,0 +1,30 @@
+{
+  "1234": {
+    "id": "1234",
+    "name": "Sarah Lee",
+    "department": "Engineering",
+    "status": "on leave",
+    "email": "sarah.lee@company.com"
+  },
+  "5678": {
+    "id": "5678",
+    "name": "Tom Alvarez",
+    "department": "Marketing",
+    "status": "active",
+    "email": "tom.alvarez@company.com"
+  },
+  "9012": {
+    "id": "9012",
+    "name": "Priya Sharma",
+    "department": "Design",
+    "status": "remote",
+    "email": "priya.sharma@company.com"
+  },
+  "3456": {
+    "id": "3456",
+    "name": "Carlos Mendes",
+    "department": "Finance",
+    "status": "active",
+    "email": "carlos.mendes@company.com"
+  }
+}

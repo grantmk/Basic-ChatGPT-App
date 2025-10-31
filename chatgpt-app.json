@@ -16,7 +16,7 @@
     "servers": [
       {
         "name": "companydb-mcp",
-        "url": "https://YOUR_DOMAIN/.well-known/mcp.json",
+        "url": "https://supermathematical-readjustable-ariana.ngrok-free.dev/.well-known/mcp.json",
         "auth": {
           "type": "api_key",
           "header_name": "Authorization",
@@ -34,7 +34,7 @@
   "ui": {
     "entrypoint": {
       "type": "html",
-      "content_url": "https://YOUR_DOMAIN/ui/index.html"
+      "content_url": "https://supermathematical-readjustable-ariana.ngrok-free.dev/ui/index.html"
     }
   }
 }
