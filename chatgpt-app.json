@@ -16,12 +16,7 @@
     "servers": [
       {
         "name": "companydb-mcp",
-        "url": "https://supermathematical-readjustable-ariana.ngrok-free.dev/.well-known/mcp.json",
-        "auth": {
-          "type": "api_key",
-          "header_name": "Authorization",
-          "token_format": "Bearer <API_KEY>"
-        }
+        "url": "https://supermathematical-readjustable-ariana.ngrok-free.dev/.well-known/mcp.json"
       }
     ]
   },
