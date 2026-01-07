@@ -29,5 +29,5 @@ Endpoints:
 4. Submit `chatgpt-app.json` to the ChatGPT App Store submission flow.
 
 ## Security notes
-- The HTML UI does not hardcode secrets; when inside ChatGPT, tool calls are proxied via the MCP bridge.
+ - The HTML UI does not hardcode secrets; when inside ChatGPT, tool calls are proxied via the MCP bridge.
 - CORS is enabled for simplicity; tighten origins in production.
